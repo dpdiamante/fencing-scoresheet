@@ -3,6 +3,7 @@ package dpd.lab.sports.fencing;
 import dpd.lab.sports.fencing.exceptions.FencerNotFoundException;
 import dpd.lab.sports.fencing.exceptions.InvalidBoutException;
 
+import java.util.Optional;
 import java.util.Set;
 
 public class Bout {
@@ -38,10 +39,22 @@ public class Bout {
         return Set.of(firstBoutFencer.getFencer(), secondBoutFencer.getFencer());
     }
 
-    public Bout addPoint(Fencer fencer) {
-        if (status == BoutStatus.NOT_STARTED) {
-            status = BoutStatus.ONGOING;
+    public Integer getScore(Fencer fencer) {
+        if (firstBoutFencer.getFencer().equals(fencer)) {
+            return firstBoutFencer.getScore();
+        } else if (secondBoutFencer.getFencer().equals(fencer)) {
+            return secondBoutFencer.getScore();
+        } else {
+            throw new FencerNotFoundException("Fencer not found");
         }
+    }
+
+    public Bout addPoint(Fencer fencer) {
+        if (status == BoutStatus.FINISHED) {
+            firstBoutFencer.setStatus(null);
+            secondBoutFencer.setStatus(null);
+        }
+        status = BoutStatus.ONGOING;
 
         if (firstBoutFencer.getFencer().equals(fencer)) {
             firstBoutFencer.addPoint();

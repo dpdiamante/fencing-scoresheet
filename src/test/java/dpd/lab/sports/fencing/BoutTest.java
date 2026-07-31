@@ -28,7 +28,7 @@ public class BoutTest {
     }
 
     @Test
-    public void shouldStartBoutCorrectly() {
+    public void shouldStartAndProgressBoutCorrectly() {
         Bout bout = new Bout(firstBoutFencer, secondBoutFencer);
         bout.addPoint(firstBoutFencer);
         bout.addPoint(firstBoutFencer);
@@ -37,5 +37,23 @@ public class BoutTest {
         bout.addPoint(secondBoutFencer);
 
         assertThat(bout.getStatus()).isEqualTo(ONGOING);
+        assertThat(bout.getScore(firstBoutFencer)).isEqualTo(3);
+        assertThat(bout.getScore(secondBoutFencer)).isEqualTo(2);
+    }
+
+    @Test
+    public void shouldConcludeBoutCorrectly() {
+        Bout bout = new Bout(firstBoutFencer, secondBoutFencer);
+        bout.addPoint(firstBoutFencer);
+        bout.addPoint(firstBoutFencer);
+        bout.addPoint(firstBoutFencer);
+        bout.addPoint(secondBoutFencer);
+        bout.addPoint(secondBoutFencer);
+        bout.addPoint(firstBoutFencer);
+        bout.addPoint(secondBoutFencer);
+        bout.addPoint(firstBoutFencer);
+        bout.conclude();
+        assertThat(bout.getScore(firstBoutFencer)).isEqualTo(5);
+        assertThat(bout.getScore(secondBoutFencer)).isEqualTo(3);
     }
 }
