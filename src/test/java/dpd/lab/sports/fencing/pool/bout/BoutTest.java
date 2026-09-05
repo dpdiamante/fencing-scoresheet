@@ -1,0 +1,106 @@
+package dpd.lab.sports.fencing.pool.bout;
+
+import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static dpd.lab.sports.fencing.pool.bout.assertions.BoutAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+public class BoutTest {
+
+    private dpd.lab.sports.fencing.pool.Fencer zorro;
+
+    private dpd.lab.sports.fencing.pool.Fencer luke;
+
+    @BeforeEach
+    void setUp() {
+        zorro = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Zorro"), 1);
+        luke = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Luke"), 5);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInstantiatedWithTheSameFencers() {
+        assertThatThrownBy(() -> new Bout(zorro, zorro))
+                .isInstanceOf(InvalidBoutException.class)
+                .hasMessage("A bout must have 2 different fencers");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInstantiatedWithFencersOfTheSamePosition() {
+        dpd.lab.sports.fencing.pool.Fencer vader =
+                new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Darth"), 1);
+
+        assertThatThrownBy(() -> new Bout(zorro, vader))
+                .isInstanceOf(InvalidBoutException.class)
+                .hasMessage("Bout fencers must have different positions");
+    }
+
+    @Test
+    void shouldSuccessfullyCreateBout() {
+        assertThat(new Bout(zorro, luke))
+                .hasPlayer(zorro).hasPlayer(luke)
+                .hasNotStartedYet()
+                .hasNoWinner().hasNoLoser();
+    }
+
+    @Test
+    void shouldStartMatchProperly() {
+        Bout testBout = new Bout(zorro, luke);
+        testBout.startBout();
+
+        assertThat(testBout).hasStarted().notFinishedYet()
+                .hasNoWinner().hasNoLoser();
+    }
+
+    @Test
+    void shouldFinishMatchProperly() {
+        Bout testBout = new Bout(zorro, luke);
+        testBout.finishBout().withWinner(zorro, 5).withDefeated(luke, 3).conclude();
+
+        assertThat(testBout).hasFinished()
+                .hasWinnerWithScore(zorro, 5)
+                .hasLoserWithScore(luke, 3);
+    }
+
+    @Test
+    void shouldFinishMatchWhenSomeoneRetired() {
+        Bout testBout = new Bout(zorro, luke);
+        testBout.finishBout().withRetired(zorro, 5).withWinner(luke, 3).conclude();
+
+        assertThat(testBout).hasFinished()
+                .hasLoserWithScore(zorro, 5)
+                .hasWinnerWithScore(luke, 3);
+    }
+
+    @Test
+    void shouldNotConcludeBoutWithNoWinner() {
+        Bout testBout = new Bout(zorro, luke);
+        Bout.BoutConclusion conclusion = testBout.finishBout().withDefeated(zorro, 5);
+
+        assertThatThrownBy(conclusion::conclude)
+                .isInstanceOf(InvalidBoutException.class)
+                .hasMessage("A winner and a defeated fencer must both be specified");
+    }
+
+    @Test
+    void shouldNotConcludeBoutWithNoLoser() {
+        Bout testBout = new Bout(zorro, luke);
+        Bout.BoutConclusion conclusion = testBout.finishBout().withWinner(zorro, 5);
+
+        assertThatThrownBy(conclusion::conclude)
+                .isInstanceOf(InvalidBoutException.class)
+                .hasMessage("A winner and a defeated fencer must both be specified");
+    }
+
+    @Test
+    void shouldNotConcludeBoutWithSameWinnerOrLoser() {
+        Bout testBout = new Bout(zorro, luke);
+        Bout.BoutConclusion conclusion = testBout.finishBout().withWinner(zorro, 5).withDefeated(zorro, 5);
+
+        assertThatThrownBy(conclusion::conclude)
+                .isInstanceOf(InvalidBoutException.class)
+                .hasMessage("The winner and the defeated fencer must be different");
+    }
+
+}

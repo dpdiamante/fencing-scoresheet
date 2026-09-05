@@ -1,4 +1,4 @@
-package dpd.lab.sports.fencing;
+package dpd.lab.sports.fencing.pool.bout;
 
 public enum BoutStatus {
 
