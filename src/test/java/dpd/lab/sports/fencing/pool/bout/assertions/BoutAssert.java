@@ -1,5 +1,6 @@
 package dpd.lab.sports.fencing.pool.bout.assertions;
 
+import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.Bout;
 import org.assertj.core.api.AbstractAssert;
 
@@ -11,7 +12,7 @@ public class BoutAssert extends AbstractAssert<BoutAssert, Bout> {
         super(actual, BoutAssert.class);
     }
 
-    public BoutAssert hasPlayer(dpd.lab.sports.fencing.pool.Fencer fencer) {
+    public BoutAssert hasPlayer(PoolFencer fencer) {
         assertThat(actual.hasFencer(fencer)).isTrue();
 
         return myself;
@@ -47,7 +48,7 @@ public class BoutAssert extends AbstractAssert<BoutAssert, Bout> {
         return myself;
     }
 
-    public BoutAssert hasWinnerWithScore(dpd.lab.sports.fencing.pool.Fencer fencer, int score) {
+    public BoutAssert hasWinnerWithScore(PoolFencer fencer, int score) {
         assertThat(actual.getWinner()).isNotEmpty();
         assertThat(actual.getWinner().get().getFencer()).isEqualTo(fencer);
         assertThat(actual.getWinner().get().getScore()).isEqualTo(score);
@@ -55,7 +56,7 @@ public class BoutAssert extends AbstractAssert<BoutAssert, Bout> {
         return myself;
     }
 
-    public BoutAssert hasLoserWithScore(dpd.lab.sports.fencing.pool.Fencer fencer, int score) {
+    public BoutAssert hasLoserWithScore(PoolFencer fencer, int score) {
         assertThat(actual.getDefeated()).isNotEmpty();
         assertThat(actual.getDefeated().get().getFencer()).isEqualTo(fencer);
         assertThat(actual.getDefeated().get().getScore()).isEqualTo(score);

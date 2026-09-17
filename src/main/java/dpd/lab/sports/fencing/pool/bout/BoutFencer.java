@@ -1,21 +1,23 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import dpd.lab.sports.fencing.pool.PoolFencer;
+
 import java.util.Objects;
 import java.util.Optional;
 
-public class Fencer {
+public class BoutFencer {
 
-    private final dpd.lab.sports.fencing.pool.Fencer fencer;
+    private final PoolFencer fencer;
 
     private int score;
 
     private FencerStatus status;
 
-    Fencer(dpd.lab.sports.fencing.pool.Fencer fencer) {
+    BoutFencer(PoolFencer fencer) {
         this.fencer = fencer;
     }
 
-    public dpd.lab.sports.fencing.pool.Fencer getFencer() {
+    public PoolFencer getFencer() {
         return fencer;
     }
 
@@ -40,7 +42,7 @@ public class Fencer {
         if (this == that)
             return true;
 
-        if (!(that instanceof Fencer thatFencer))
+        if (!(that instanceof BoutFencer thatFencer))
             return false;
 
         return Objects.equals(fencer, thatFencer.fencer);

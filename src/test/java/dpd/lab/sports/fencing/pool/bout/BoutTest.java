@@ -1,5 +1,6 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,14 +10,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BoutTest {
 
-    private dpd.lab.sports.fencing.pool.Fencer zorro;
+    private PoolFencer zorro;
 
-    private dpd.lab.sports.fencing.pool.Fencer luke;
+    private PoolFencer luke;
 
     @BeforeEach
     void setUp() {
-        zorro = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Zorro"), 1);
-        luke = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Luke"), 5);
+        zorro = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Zorro"), 1);
+        luke = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Luke"), 5);
     }
 
     @Test
@@ -28,8 +29,7 @@ public class BoutTest {
 
     @Test
     void shouldThrowExceptionWhenInstantiatedWithFencersOfTheSamePosition() {
-        dpd.lab.sports.fencing.pool.Fencer vader =
-                new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Darth"), 1);
+        PoolFencer vader = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Darth"), 1);
 
         assertThatThrownBy(() -> new Bout(zorro, vader))
                 .isInstanceOf(InvalidBoutException.class)

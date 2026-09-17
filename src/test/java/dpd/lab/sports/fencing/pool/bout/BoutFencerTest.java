@@ -1,52 +1,53 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import dpd.lab.sports.fencing.pool.PoolFencer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class FencerTest {
+class BoutFencerTest {
 
-    private dpd.lab.sports.fencing.pool.Fencer johnPoolFencer;
+    private PoolFencer johnPoolFencer;
 
-    private dpd.lab.sports.fencing.pool.Fencer janePoolFencer;
+    private PoolFencer janePoolFencer;
 
     @BeforeEach
     void setUp() {
-        johnPoolFencer = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("John Smith"), 1);
-        janePoolFencer = new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("Jane Doe"), 2);
+        johnPoolFencer = new PoolFencer(new dpd.lab.sports.fencing.Fencer("John Smith"), 1);
+        janePoolFencer = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Jane Doe"), 2);
     }
 
     @Test
     void shouldBeEqualToItself() {
-        Fencer fencer = new Fencer(johnPoolFencer);
+        BoutFencer fencer = new BoutFencer(johnPoolFencer);
 
         assertThat(fencer).isEqualTo(fencer).hasSameHashCodeAs(fencer);
     }
 
     @Test
     void shouldBeEqualWhenWrappingTheSamePoolFencerInstance() {
-        Fencer first = new Fencer(johnPoolFencer);
-        Fencer second = new Fencer(johnPoolFencer);
+        BoutFencer first = new BoutFencer(johnPoolFencer);
+        BoutFencer second = new BoutFencer(johnPoolFencer);
 
         assertThat(first).isEqualTo(second).hasSameHashCodeAs(second);
     }
 
     @Test
     void shouldBeEqualWhenWrappingAnEqualButDistinctPoolFencer() {
-        dpd.lab.sports.fencing.pool.Fencer equivalentPoolFencer =
-                new dpd.lab.sports.fencing.pool.Fencer(new dpd.lab.sports.fencing.Fencer("John Smith"), 1);
+        PoolFencer equivalentPoolFencer =
+                new PoolFencer(new dpd.lab.sports.fencing.Fencer("John Smith"), 1);
 
-        Fencer first = new Fencer(johnPoolFencer);
-        Fencer second = new Fencer(equivalentPoolFencer);
+        BoutFencer first = new BoutFencer(johnPoolFencer);
+        BoutFencer second = new BoutFencer(equivalentPoolFencer);
 
         assertThat(first).isEqualTo(second).hasSameHashCodeAs(second);
     }
 
     @Test
     void shouldRemainEqualRegardlessOfScoreOrStatus() {
-        Fencer first = new Fencer(johnPoolFencer);
-        Fencer second = new Fencer(johnPoolFencer);
+        BoutFencer first = new BoutFencer(johnPoolFencer);
+        BoutFencer second = new BoutFencer(johnPoolFencer);
 
         first.setScore(3);
         first.setStatus(FencerStatus.VICTOR);
@@ -58,22 +59,22 @@ class FencerTest {
 
     @Test
     void shouldNotBeEqualWhenWrappingDifferentPoolFencers() {
-        Fencer first = new Fencer(johnPoolFencer);
-        Fencer second = new Fencer(janePoolFencer);
+        BoutFencer first = new BoutFencer(johnPoolFencer);
+        BoutFencer second = new BoutFencer(janePoolFencer);
 
         assertThat(first).isNotEqualTo(second);
     }
 
     @Test
     void shouldNotBeEqualToNull() {
-        Fencer fencer = new Fencer(johnPoolFencer);
+        BoutFencer fencer = new BoutFencer(johnPoolFencer);
 
         assertThat(fencer).isNotEqualTo(null);
     }
 
     @Test
     void shouldNotBeEqualToAnInstanceOfAnUnrelatedType() {
-        Fencer boutFencer = new Fencer(johnPoolFencer);
+        BoutFencer boutFencer = new BoutFencer(johnPoolFencer);
 
         assertThat(boutFencer).isNotEqualTo(johnPoolFencer);
     }

@@ -1,5 +1,6 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.FencerNotFoundException;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
 
@@ -8,11 +9,11 @@ import java.util.Set;
 
 public class Bout {
 
-    private final Set<Fencer> fencers;
+    private final Set<BoutFencer> fencers;
 
     private BoutStatus status = BoutStatus.NOT_STARTED;
 
-    public Bout(dpd.lab.sports.fencing.pool.Fencer fencer, dpd.lab.sports.fencing.pool.Fencer anotherFencer) {
+    public Bout(PoolFencer fencer, PoolFencer anotherFencer) {
         if (fencer.equals(anotherFencer)) {
             throw new InvalidBoutException("A bout must have 2 different fencers");
         }
@@ -21,10 +22,10 @@ public class Bout {
             throw new InvalidBoutException("Bout fencers must have different positions");
         }
 
-        this.fencers = Set.of(new Fencer(fencer), new Fencer(anotherFencer));
+        this.fencers = Set.of(new BoutFencer(fencer), new BoutFencer(anotherFencer));
     }
 
-    public Set<Fencer> getFencers() {
+    public Set<BoutFencer> getFencers() {
         return fencers;
     }
 
@@ -44,11 +45,11 @@ public class Bout {
         status = BoutStatus.ONGOING;
     }
 
-    public boolean hasFencer(dpd.lab.sports.fencing.pool.Fencer fencer) {
+    public boolean hasFencer(PoolFencer fencer) {
         return fencers.stream().anyMatch(e -> e.getFencer().equals(fencer));
     }
 
-    public Optional<Fencer> getWinner() {
+    public Optional<BoutFencer> getWinner() {
         if (!isFinished()) {
             return Optional.empty();
         }
@@ -62,7 +63,7 @@ public class Bout {
         }).findFirst();
     }
 
-    public Optional<Fencer> getDefeated() {
+    public Optional<BoutFencer> getDefeated() {
         if (!isFinished()) {
             return Optional.empty();
         }
@@ -90,7 +91,7 @@ public class Bout {
         return new BoutConclusion();
     }
 
-    private Fencer findFencer(dpd.lab.sports.fencing.pool.Fencer fencer) {
+    private BoutFencer findFencer(PoolFencer fencer) {
         return fencers.stream()
                 .filter(boutFencer -> boutFencer.getFencer().equals(fencer))
                 .findFirst()
@@ -99,25 +100,25 @@ public class Bout {
 
     public class BoutConclusion {
 
-        private Fencer winner;
+        private BoutFencer winner;
 
-        private Fencer defeated;
+        private BoutFencer defeated;
 
-        public BoutConclusion withWinner(dpd.lab.sports.fencing.pool.Fencer fencer, Integer score) {
+        public BoutConclusion withWinner(PoolFencer fencer, Integer score) {
             winner = findFencer(fencer);
             winner.setScore(score);
             winner.setStatus(FencerStatus.VICTOR);
             return this;
         }
 
-        public BoutConclusion withDefeated(dpd.lab.sports.fencing.pool.Fencer fencer, Integer score) {
+        public BoutConclusion withDefeated(PoolFencer fencer, Integer score) {
             defeated = findFencer(fencer);
             defeated.setScore(score);
             defeated.setStatus(FencerStatus.DEFEAT);
             return this;
         }
 
-        public BoutConclusion withRetired(dpd.lab.sports.fencing.pool.Fencer fencer, Integer score) {
+        public BoutConclusion withRetired(PoolFencer fencer, Integer score) {
             defeated = findFencer(fencer);
             defeated.setScore(score);
             defeated.setStatus(FencerStatus.RETIRED);
