@@ -1,5 +1,7 @@
 package dpd.lab.sports.fencing.pool;
 
-public record PoolFencer(dpd.lab.sports.fencing.Fencer fencer, Integer position) {
+import dpd.lab.sports.fencing.Fencer;
+
+public record PoolFencer(Fencer fencer, Integer position) {
 
 }

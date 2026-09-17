@@ -1,7 +1,9 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import dpd.lab.sports.fencing.Fencer;
 import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +18,8 @@ public class BoutTest {
 
     @BeforeEach
     void setUp() {
-        zorro = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Zorro"), 1);
-        luke = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Luke"), 5);
+        zorro = new PoolFencer(new Fencer("Zorro"), 1);
+        luke = new PoolFencer(new Fencer("Luke"), 5);
     }
 
     @Test
@@ -29,7 +31,7 @@ public class BoutTest {
 
     @Test
     void shouldThrowExceptionWhenInstantiatedWithFencersOfTheSamePosition() {
-        PoolFencer vader = new PoolFencer(new dpd.lab.sports.fencing.Fencer("Darth"), 1);
+        PoolFencer vader = new PoolFencer(new Fencer("Darth"), 1);
 
         assertThatThrownBy(() -> new Bout(zorro, vader))
                 .isInstanceOf(InvalidBoutException.class)
@@ -101,6 +103,56 @@ public class BoutTest {
         assertThatThrownBy(conclusion::conclude)
                 .isInstanceOf(InvalidBoutException.class)
                 .hasMessage("The winner and the defeated fencer must be different");
+    }
+
+    @Test
+    void shouldBeEqualToItself() {
+        Bout bout = new Bout(zorro, luke);
+
+        Assertions.assertThat(bout).isEqualTo(bout).hasSameHashCodeAs(bout);
+    }
+
+    @Test
+    void shouldBeEqualWhenWrappingTheSameFencersRegardlessOfOrder() {
+        Bout first = new Bout(zorro, luke);
+        Bout second = new Bout(luke, zorro);
+
+        Assertions.assertThat(first).isEqualTo(second).hasSameHashCodeAs(second);
+    }
+
+    @Test
+    void shouldRemainEqualRegardlessOfBoutProgress() {
+        Bout first = new Bout(zorro, luke);
+        Bout second = new Bout(zorro, luke);
+
+        first.startBout();
+        first.finishBout().withWinner(zorro, 5).withDefeated(luke, 3).conclude();
+
+        Assertions.assertThat(first).isEqualTo(second).hasSameHashCodeAs(second);
+    }
+
+    @Test
+    void shouldNotBeEqualWhenWrappingDifferentFencers() {
+        PoolFencer vader = new PoolFencer(new Fencer("Darth"), 2);
+
+        Bout first = new Bout(zorro, luke);
+        Bout second = new Bout(zorro, vader);
+
+        Assertions.assertThat(first).isNotEqualTo(second);
+    }
+
+    @Test
+    void shouldNotBeEqualToNull() {
+        Bout bout = new Bout(zorro, luke);
+
+        Assertions.assertThat(bout).isNotEqualTo(null);
+    }
+
+    @Test
+    void shouldNotBeEqualToAnInstanceOfAnUnrelatedType() {
+        Bout bout = new Bout(zorro, luke);
+
+        Assertions.assertThat(bout).isNotEqualTo(zorro);
     }
 
 }

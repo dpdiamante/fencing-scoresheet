@@ -4,6 +4,7 @@ import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.FencerNotFoundException;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -96,6 +97,22 @@ public class Bout {
                 .filter(boutFencer -> boutFencer.getFencer().equals(fencer))
                 .findFirst()
                 .orElseThrow(() -> new FencerNotFoundException(fencer + " is not part of this bout"));
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that)
+            return true;
+
+        if (!(that instanceof Bout thatBout))
+            return false;
+
+        return Objects.equals(fencers, thatBout.fencers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fencers);
     }
 
     public class BoutConclusion {
