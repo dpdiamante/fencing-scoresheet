@@ -1,5 +1,6 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import com.google.gson.Gson;
 import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.FencerNotFoundException;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
@@ -9,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Bout {
+
+    private static final Gson GSON = new Gson();
 
     private final Set<BoutFencer> fencers;
 
@@ -113,6 +116,11 @@ public class Bout {
     @Override
     public int hashCode() {
         return Objects.hash(fencers);
+    }
+
+    @Override
+    public String toString() {
+        return GSON.toJson(this);
     }
 
     public class BoutConclusion {

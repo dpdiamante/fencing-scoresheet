@@ -1,11 +1,14 @@
 package dpd.lab.sports.fencing.pool.bout;
 
+import com.google.gson.Gson;
 import dpd.lab.sports.fencing.pool.PoolFencer;
 
 import java.util.Objects;
 import java.util.Optional;
 
 public class BoutFencer {
+
+    private static final Gson GSON = new Gson();
 
     private final PoolFencer fencer;
 
@@ -51,5 +54,10 @@ public class BoutFencer {
     @Override
     public int hashCode() {
         return Objects.hash(fencer);
+    }
+
+    @Override
+    public String toString() {
+        return GSON.toJson(this);
     }
 }
