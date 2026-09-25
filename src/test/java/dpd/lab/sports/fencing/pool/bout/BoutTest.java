@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static dpd.lab.sports.fencing.pool.bout.assertions.BoutAssertions.assertThat;
+import static dpd.lab.sports.fencing.pool.PoolAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BoutTest {

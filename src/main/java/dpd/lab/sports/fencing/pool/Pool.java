@@ -2,13 +2,16 @@ package dpd.lab.sports.fencing.pool;
 
 import com.google.gson.Gson;
 import dpd.lab.sports.fencing.pool.bout.Bout;
+import dpd.lab.sports.fencing.pool.exceptions.FencerNotInPoolException;
 import dpd.lab.sports.fencing.pool.exceptions.InvalidPoolException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Pool {
 
@@ -48,11 +51,79 @@ public class Pool {
     }
 
     public Set<Bout> getBouts() {
-        return bouts;
+        return Collections.unmodifiableSet(bouts);
+    }
+
+    public Bout getBoutBetween(PoolFencer fencer, PoolFencer anotherFencer) {
+        return bouts.stream()
+                .filter(e -> e.hasFencer(fencer) && e.hasFencer(anotherFencer))
+                .findFirst()
+                .orElseThrow(() -> new FencerNotInPoolException(
+                        "There is no bout between " + fencer + " and " + anotherFencer));
+    }
+
+    public Set<Bout> getBoutsOf(PoolFencer fencer) {
+        return bouts.stream()
+                .filter(e -> e.hasFencer(fencer))
+                .collect(Collectors.toSet());
+    }
+
+    public ResultRecorder recordResult() {
+        return new ResultRecorder();
     }
 
     @Override
     public String toString() {
         return GSON.toJson(this);
+    }
+
+    public class ResultRecorder {
+
+        private PoolFencer winner;
+
+        private int winnerScore;
+
+        private PoolFencer defeated;
+
+        private int defeatedScore;
+
+        private boolean retired;
+
+        public ResultRecorder withWinner(PoolFencer fencer, int score) {
+            winner = fencer;
+            winnerScore = score;
+            return this;
+        }
+
+        public ResultRecorder withDefeated(PoolFencer fencer, int score) {
+            defeated = fencer;
+            defeatedScore = score;
+            retired = false;
+            return this;
+        }
+
+        public ResultRecorder withRetired(PoolFencer fencer, int score) {
+            defeated = fencer;
+            defeatedScore = score;
+            retired = true;
+            return this;
+        }
+
+        public Bout record() {
+            if (winner == null || defeated == null) {
+                throw new InvalidPoolException("A winner and a defeated fencer must both be specified");
+            }
+
+            Bout bout = getBoutBetween(winner, defeated);
+            Bout.BoutConclusion conclusion = bout.finishBout().withWinner(winner, winnerScore);
+
+            if (retired) {
+                conclusion.withRetired(defeated, defeatedScore);
+            } else {
+                conclusion.withDefeated(defeated, defeatedScore);
+            }
+
+            return conclusion.conclude();
+        }
     }
 }

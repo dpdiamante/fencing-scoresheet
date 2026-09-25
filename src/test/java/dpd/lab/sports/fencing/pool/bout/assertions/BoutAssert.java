@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BoutAssert extends AbstractAssert<BoutAssert, Bout> {
 
-    BoutAssert(Bout actual) {
+    public BoutAssert(Bout actual) {
         super(actual, BoutAssert.class);
     }
 
