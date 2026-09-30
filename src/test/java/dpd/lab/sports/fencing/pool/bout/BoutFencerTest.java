@@ -1,10 +1,10 @@
 package dpd.lab.sports.fencing.pool.bout;
 
-import dpd.lab.sports.fencing.Fencer;
 import dpd.lab.sports.fencing.pool.PoolFencer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static dpd.lab.sports.fencing.FencerFixtures.fencerNamed;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BoutFencerTest {
@@ -15,8 +15,8 @@ class BoutFencerTest {
 
     @BeforeEach
     void setUp() {
-        johnPoolFencer = new PoolFencer(new Fencer("John Smith"), 1);
-        janePoolFencer = new PoolFencer(new Fencer("Jane Doe"), 2);
+        johnPoolFencer = new PoolFencer(fencerNamed("John Smith"), 1);
+        janePoolFencer = new PoolFencer(fencerNamed("Jane Doe"), 2);
     }
 
     @Test
@@ -37,7 +37,7 @@ class BoutFencerTest {
     @Test
     void shouldBeEqualWhenWrappingAnEqualButDistinctPoolFencer() {
         PoolFencer equivalentPoolFencer =
-                new PoolFencer(new Fencer("John Smith"), 1);
+                new PoolFencer(johnPoolFencer.fencer(), johnPoolFencer.position());
 
         BoutFencer first = new BoutFencer(johnPoolFencer);
         BoutFencer second = new BoutFencer(equivalentPoolFencer);

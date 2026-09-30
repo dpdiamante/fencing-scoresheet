@@ -1,6 +1,5 @@
 package dpd.lab.sports.fencing.pool;
 
-import dpd.lab.sports.fencing.Fencer;
 import dpd.lab.sports.fencing.pool.bout.Bout;
 import dpd.lab.sports.fencing.pool.exceptions.FencerNotInPoolException;
 import dpd.lab.sports.fencing.pool.exceptions.InvalidPoolException;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static dpd.lab.sports.fencing.FencerFixtures.fencerNamed;
 import static dpd.lab.sports.fencing.pool.PoolAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -33,13 +33,13 @@ public class PoolTest {
 
     @BeforeEach
     void setUp() {
-        dArtagnan = new PoolFencer(new Fencer("D'Artagnan"), 1);
-        athos = new PoolFencer(new Fencer("Athos"), 2);
-        porthos = new PoolFencer(new Fencer("Porthos"), 3);
-        aramis = new PoolFencer(new Fencer("Aramis"), 4);
-        inigo = new PoolFencer(new Fencer("Inigo"), 5);
-        westley = new PoolFencer(new Fencer("Westley"), 6);
-        musashi = new PoolFencer(new Fencer("Musashi"), 7);
+        dArtagnan = new PoolFencer(fencerNamed("D'Artagnan"), 1);
+        athos = new PoolFencer(fencerNamed("Athos"), 2);
+        porthos = new PoolFencer(fencerNamed("Porthos"), 3);
+        aramis = new PoolFencer(fencerNamed("Aramis"), 4);
+        inigo = new PoolFencer(fencerNamed("Inigo"), 5);
+        westley = new PoolFencer(fencerNamed("Westley"), 6);
+        musashi = new PoolFencer(fencerNamed("Musashi"), 7);
 
         testPool = Pool.buildFrom(dArtagnan, athos, porthos, aramis, inigo, westley, musashi);
     }
@@ -75,7 +75,7 @@ public class PoolTest {
 
     @Test
     void shouldNotBeAbleToUpdatePoolBoutCorrectly() {
-        PoolFencer darthVader = new PoolFencer(new Fencer("Darth Vader"), 9);
+        PoolFencer darthVader = new PoolFencer(fencerNamed("Darth Vader"), 9);
 
         assertThatExceptionOfType(FencerNotInPoolException.class).isThrownBy(
                         () -> testPool.recordResult().withWinner(darthVader, 5).withDefeated(dArtagnan, 1).record())
@@ -97,10 +97,43 @@ public class PoolTest {
 
     @Test
     void shouldThrowExceptionWhenFencerNotInPool() {
-        PoolFencer darthVader = new PoolFencer(new Fencer("Darth Vader"), 9);
+        PoolFencer darthVader = new PoolFencer(fencerNamed("Darth Vader"), 9);
 
         assertThatExceptionOfType(FencerNotInPoolException.class).isThrownBy(
                 () -> testPool.getBoutBetween(aramis, darthVader)
         ).withMessageContaining("There is no bout between");
+    }
+
+    @Test
+    void shouldBeEqualToItself() {
+        assertThat(testPool).isEqualTo(testPool).hasSameHashCodeAs(testPool);
+    }
+
+    @Test
+    void shouldRemainEqualToItselfRegardlessOfBoutProgress() {
+        int hashCodeBefore = testPool.hashCode();
+
+        testPool.recordResult().withWinner(athos, 5).withDefeated(dArtagnan, 2).record();
+
+        assertThat(testPool).isEqualTo(testPool);
+        assertThat(testPool.hashCode()).isEqualTo(hashCodeBefore);
+    }
+
+    @Test
+    void shouldNotBeEqualToAnotherPoolWithTheSameFencers() {
+        Pool anotherPool = Pool.buildFrom(dArtagnan, athos, porthos, aramis, inigo, westley, musashi);
+
+        assertThat(testPool).isNotEqualTo(anotherPool);
+        assertThat(testPool.getId()).isNotEqualTo(anotherPool.getId());
+    }
+
+    @Test
+    void shouldNotBeEqualToNull() {
+        assertThat(testPool).isNotEqualTo(null);
+    }
+
+    @Test
+    void shouldNotBeEqualToAnInstanceOfAnUnrelatedType() {
+        assertThat(testPool).isNotEqualTo(dArtagnan);
     }
 }

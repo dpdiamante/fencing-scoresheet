@@ -10,16 +10,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Pool {
 
     private static final Gson GSON = new Gson();
 
+    private final UUID id;
+
     private final Set<Bout> bouts;
 
     private Pool(Set<Bout> bouts) {
+        this.id = UUID.randomUUID();
         this.bouts = bouts;
     }
 
@@ -50,6 +55,10 @@ public class Pool {
         return new Pool(bouts);
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public Set<Bout> getBouts() {
         return Collections.unmodifiableSet(bouts);
     }
@@ -70,6 +79,22 @@ public class Pool {
 
     public ResultRecorder recordResult() {
         return new ResultRecorder();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that)
+            return true;
+
+        if (!(that instanceof Pool thatPool))
+            return false;
+
+        return Objects.equals(id, thatPool.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

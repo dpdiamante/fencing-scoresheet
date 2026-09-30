@@ -1,12 +1,12 @@
 package dpd.lab.sports.fencing.pool.bout;
 
-import dpd.lab.sports.fencing.Fencer;
 import dpd.lab.sports.fencing.pool.PoolFencer;
 import dpd.lab.sports.fencing.pool.bout.exceptions.InvalidBoutException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static dpd.lab.sports.fencing.FencerFixtures.fencerNamed;
 import static dpd.lab.sports.fencing.pool.PoolAssertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -18,8 +18,8 @@ public class BoutTest {
 
     @BeforeEach
     void setUp() {
-        zorro = new PoolFencer(new Fencer("Zorro"), 1);
-        luke = new PoolFencer(new Fencer("Luke"), 5);
+        zorro = new PoolFencer(fencerNamed("Zorro"), 1);
+        luke = new PoolFencer(fencerNamed("Luke"), 5);
     }
 
     @Test
@@ -31,7 +31,7 @@ public class BoutTest {
 
     @Test
     void shouldThrowExceptionWhenInstantiatedWithFencersOfTheSamePosition() {
-        PoolFencer vader = new PoolFencer(new Fencer("Darth"), 1);
+        PoolFencer vader = new PoolFencer(fencerNamed("Darth"), 1);
 
         assertThatThrownBy(() -> new Bout(zorro, vader))
                 .isInstanceOf(InvalidBoutException.class)
@@ -133,7 +133,7 @@ public class BoutTest {
 
     @Test
     void shouldNotBeEqualWhenWrappingDifferentFencers() {
-        PoolFencer vader = new PoolFencer(new Fencer("Darth"), 2);
+        PoolFencer vader = new PoolFencer(fencerNamed("Darth"), 2);
 
         Bout first = new Bout(zorro, luke);
         Bout second = new Bout(zorro, vader);
