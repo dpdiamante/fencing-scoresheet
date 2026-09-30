@@ -1,0 +1,22 @@
+# Local development database. Start with `docker compose --env-file env.properties up -d --wait`.
+services:
+  postgres:
+    image: postgres:18
+    container_name: fencing-scoresheet-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is not set, run with --env-file env.properties}
+      POSTGRES_USER: ${DB_USER:?DB_USER is not set, run with --env-file env.properties}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set, run with --env-file env.properties}
+    ports:
+      - "${DB_PORT:?DB_PORT is not set, run with --env-file env.properties}:5432"
+    volumes:
+      # Postgres 18+ images keep data under /var/lib/postgresql/<major>/, so mount the parent
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:

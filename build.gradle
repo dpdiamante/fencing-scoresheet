@@ -1,6 +1,16 @@
+buildscript {
+    dependencies {
+        // Flyway's Gradle plugin needs the database support module and JDBC driver on its own classpath
+        classpath 'org.flywaydb:flyway-database-postgresql:13.8.0'
+        classpath 'org.postgresql:postgresql:42.7.13'
+    }
+}
+
 plugins {
+    id 'application'
     id 'java'
     id 'jacoco'
+    id 'org.flywaydb.flyway' version '13.8.0'
 }
 
 group = 'org.example'
@@ -17,6 +27,10 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:4.0.0-M1'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'dpd.lab.sports.fencing.cli.ScoresheetCli'
 }
 
 test {
@@ -40,5 +54,31 @@ jacocoTestReport {
     reports {
         xml.required = false
         html.required = true
+    }
+}
+
+// Database settings come from environment variables, falling back to env.properties (see env.properties.example)
+def envProperties = new Properties()
+def envFile = file('env.properties')
+if (envFile.exists()) {
+    envFile.withInputStream { envProperties.load(it) }
+}
+
+def dbSetting = { String key -> System.getenv(key) ?: envProperties.getProperty(key) }
+def dbKeys = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']
+
+flyway {
+    url = "jdbc:postgresql://${dbSetting('DB_HOST')}:${dbSetting('DB_PORT')}/${dbSetting('DB_NAME')}"
+    user = dbSetting('DB_USER')
+    password = dbSetting('DB_PASSWORD')
+    locations = ['filesystem:src/main/resources/db/migration']
+}
+
+tasks.matching { it.name.startsWith('flyway') }.configureEach {
+    doFirst {
+        def missing = dbKeys.findAll { !dbSetting(it) }
+        if (missing) {
+            throw new GradleException("Missing database settings ${missing}: set them as environment variables or copy env.properties.example to env.properties")
+        }
     }
 }

@@ -2,6 +2,7 @@ package dpd.lab.sports.fencing.pool;
 
 import com.google.gson.Gson;
 import dpd.lab.sports.fencing.pool.bout.Bout;
+import dpd.lab.sports.fencing.pool.bout.BoutFencer;
 import dpd.lab.sports.fencing.pool.exceptions.FencerNotInPoolException;
 import dpd.lab.sports.fencing.pool.exceptions.InvalidPoolException;
 
@@ -10,16 +11,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Pool {
 
     private static final Gson GSON = new Gson();
 
+    private final UUID id;
+
     private final Set<Bout> bouts;
 
-    private Pool(Set<Bout> bouts) {
+    private Pool(UUID id, Set<Bout> bouts) {
+        this.id = id;
         this.bouts = bouts;
     }
 
@@ -47,7 +53,46 @@ public class Pool {
             }
         }
 
-        return new Pool(bouts);
+        return new Pool(UUID.randomUUID(), bouts);
+    }
+
+    /**
+     * Restores a previously persisted pool as it was saved, including the progress of its bouts. Meant for
+     * repositories, use {@link #buildFrom} to create a new pool. Creation rules such as the minimum number of
+     * fencers are not checked again, but the bouts must still form a consistent pool.
+     */
+    public static Pool reconstitute(UUID id, Set<Bout> bouts) {
+        Objects.requireNonNull(id, "A pool must have an id");
+        requireConsistent(bouts);
+
+        return new Pool(id, new HashSet<>(bouts));
+    }
+
+    private static void requireConsistent(Set<Bout> bouts) {
+        if (bouts.isEmpty()) {
+            throw new InvalidPoolException("A pool must have bouts");
+        }
+
+        Set<PoolFencer> fencers = bouts.stream()
+                .flatMap(bout -> bout.getFencers().stream())
+                .map(BoutFencer::getFencer)
+                .collect(Collectors.toSet());
+
+        if (fencers.stream().map(PoolFencer::fencer).distinct().count() != fencers.size()) {
+            throw new InvalidPoolException("A pool cannot have duplicate fencers");
+        }
+
+        if (fencers.stream().map(PoolFencer::position).distinct().count() != fencers.size()) {
+            throw new InvalidPoolException("Fencers in a pool must have different positions");
+        }
+
+        if (bouts.size() != fencers.size() * (fencers.size() - 1) / 2) {
+            throw new InvalidPoolException("A pool must have exactly one bout between every pair of fencers");
+        }
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public Set<Bout> getBouts() {
@@ -70,6 +115,22 @@ public class Pool {
 
     public ResultRecorder recordResult() {
         return new ResultRecorder();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that)
+            return true;
+
+        if (!(that instanceof Pool thatPool))
+            return false;
+
+        return Objects.equals(id, thatPool.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

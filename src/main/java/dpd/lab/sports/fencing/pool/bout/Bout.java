@@ -29,6 +29,49 @@ public class Bout {
         this.fencers = Set.of(new BoutFencer(fencer), new BoutFencer(anotherFencer));
     }
 
+    /**
+     * Restores a previously persisted bout as it was saved, including its progress. Meant for repositories, use the
+     * constructor to create a new bout.
+     */
+    public static Bout reconstitute(BoutStatus status, BoutFencerState fencer, BoutFencerState anotherFencer) {
+        Objects.requireNonNull(status, "A bout must have a status");
+        requireResultsMatch(status, fencer, anotherFencer);
+
+        Bout bout = new Bout(fencer.fencer(), anotherFencer.fencer());
+        bout.status = status;
+        bout.restore(fencer);
+        bout.restore(anotherFencer);
+
+        return bout;
+    }
+
+    private static void requireResultsMatch(BoutStatus status, BoutFencerState fencer,
+                                            BoutFencerState anotherFencer) {
+        if (status != BoutStatus.FINISHED) {
+            if (fencer.result() != null || anotherFencer.result() != null) {
+                throw new InvalidBoutException("A bout that has not finished cannot have results");
+            }
+            return;
+        }
+
+        boolean hasOneVictor = (fencer.result() == FencerStatus.VICTOR && isDefeated(anotherFencer.result()))
+                || (anotherFencer.result() == FencerStatus.VICTOR && isDefeated(fencer.result()));
+
+        if (!hasOneVictor) {
+            throw new InvalidBoutException("A finished bout must have exactly one winner and one defeated fencer");
+        }
+    }
+
+    private static boolean isDefeated(FencerStatus result) {
+        return result == FencerStatus.DEFEAT || result == FencerStatus.RETIRED;
+    }
+
+    private void restore(BoutFencerState state) {
+        BoutFencer boutFencer = findFencer(state.fencer());
+        boutFencer.setScore(state.score());
+        boutFencer.setStatus(state.result());
+    }
+
     public Set<BoutFencer> getFencers() {
         return fencers;
     }
