@@ -11,6 +11,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'org.flywaydb.flyway' version '13.8.0'
+    id 'dev.monosoul.jooq-docker' version '9.0.6'
 }
 
 group = 'org.example'
@@ -22,11 +23,21 @@ repositories {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.14.0'
+    implementation 'org.jooq:jooq:3.21.9'
+    runtimeOnly 'org.postgresql:postgresql:42.7.13'
+
+    // Used only by the jOOQ code generation, which runs against a throwaway Postgres container
+    jooqCodegen 'org.postgresql:postgresql:42.7.13'
 
     testImplementation platform('org.junit:junit-bom:6.0.0')
     testImplementation 'org.assertj:assertj-core:4.0.0-M1'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Repository integration tests run against a real Postgres started with Testcontainers
+    testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.5'
+    testImplementation 'org.flywaydb:flyway-core:13.8.0'
+    testRuntimeOnly 'org.flywaydb:flyway-database-postgresql:13.8.0'
 }
 
 application {
@@ -72,6 +83,20 @@ flyway {
     user = dbSetting('DB_USER')
     password = dbSetting('DB_PASSWORD')
     locations = ['filesystem:src/main/resources/db/migration']
+}
+
+// jOOQ classes are generated from the Flyway migrations: the build starts a throwaway Postgres container, applies
+// src/main/resources/db/migration to it and reads the resulting schema. Needs Docker, but no running database.
+jooq {
+    withContainer {
+        image {
+            name = 'postgres:18'
+        }
+    }
+}
+
+tasks.named('generateJooqClasses') {
+    basePackageName.set('dpd.lab.sports.fencing.persistence.jooq')
 }
 
 tasks.matching { it.name.startsWith('flyway') }.configureEach {
